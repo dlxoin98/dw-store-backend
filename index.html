@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ku">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DW Store</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #00e676;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .form-box {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #333;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #00e676;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .app-card {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .app-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .app-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      object-fit: cover;
+      background-color: #333;
+    }
+    .download-btn {
+      width: auto;
+      padding: 8px 20px;
+      background-color: #29b6f6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>DW Store</h1>
+
+    <!-- Form for uploading new apps -->
+    <div class="form-box">
+      <h3>زێدەکرنا بەرنامەکێ نوو (Upload New App)</h3>
+      <form id="uploadForm">
+        <input type="text" id="appName" placeholder="ناڤێ بەرنامەی" required>
+        <input type="text" id="appVersion" placeholder="ڤێرژن (mînak: 1.0.0)" required>
+        <textarea id="appDesc" placeholder="دەربارەی بەرنامەی..." required></textarea>
+        <label>ئایکۆن (Image):</label>
+        <input type="file" id="iconFile" accept="image/*" required>
+        <label>فایلا بەرنامەی (APK File):</label>
+        <input type="file" id="apkFile" accept=".apk" required>
+        <button type="submit">بەلاڤکرن (Upload App)</button>
+      </form>
+    </div>
+
+    <!-- Section for showing available apps -->
+    <h2>بەرنامێن ئامادە (Available Apps)</h2>
+    <div id="appsList"></div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api/apps';
+
+    // Fetch and display apps
+    async function loadApps() {
+      const res = await fetch(API_URL);
+      const apps = await res.json();
+      const appsList = document.getElementById('appsList');
+      appsList.innerHTML = '';
+
+      apps.forEach(app => {
+        const card = document.createElement('div');
+        card.className = 'app-card';
+        card.innerHTML = `
+          <div class="app-info">
+            <img src="http://localhost:5000${app.iconUrl}" class="app-icon" alt="icon">
+            <div>
+              <h3>${app.name} <small style="color:#aaa;">v${app.version}</small></h3>
+              <p>${app.description}</p>
+            </div>
+          </div>
+          <a href="http://localhost:5000${app.apkUrl}" download>
+            <button class="download-btn">دابەزاندن (APK)</button>
+          </a>
+        `;
+        appsList.appendChild(card);
+      });
+    }
+
+    // Handle form submit
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData();
+      formData.append('name', document.getElementById('appName').value);
+      formData.append('version', document.getElementById('appVersion').value);
+      formData.append('description', document.getElementById('appDesc').value);
+      formData.append('icon', document.getElementById('iconFile').files[0]);
+      formData.append('apk', document.getElementById('apkFile').files[0]);
+
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res.ok) {
+        alert('بەرنامە ب سەرکەفتن هاتە زێدەکرن!');
+        document.getElementById('uploadForm').reset();
+        loadApps();
+      } else {
+        alert('کێشەیەک چێبوو د زێدەکرنێ دا!');
+      }
+    });
+
+    loadApps();
+  </script>
+</body>
+</html>
