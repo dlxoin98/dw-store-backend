@@ -9,11 +9,11 @@ app.use(express.urlencoded({ extended: true }));
 // لیستا ئەپان (بۆ نموونە)
 let apps = [
   {
-    name: "DW Network Pro",
+    name: "DW Network Pro ",
     description: "ئەپلیکەیشنا پشکنین و کۆنتڕۆڵکرنا خێرایا اینتەرنێتێ",
-    version: "1.0.0",
-    iconUrl: "https://raw.githubusercontent.com/dlxoin98/dw-store-backend/main/uploads/icon.png",
-    apkUrl: "https://raw.githubusercontent.com/dlxoin98/dw-store-backend/main/uploads/app.apk"
+    version: "1.1.0",
+    iconUrl: "https://github.com/dlxoin98/dw-store-backend/blob/main/uploads/1792442563239-ic_launcher_foreground.webp",
+    apkUrl: "https://github.com/dlxoin98/dw-store-backend/blob/main/uploads/1792442563247-app-debug.apk"
   }
 ];
 
