@@ -5,16 +5,16 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 📦 Apps Database with Screenshots and Detailed Info
+// 📦 Apps Database (Initial Store Data)
 let apps = [
   {
     id: "1710000000000",
     name: "DW Network Pro",
     description: "ئەپلیکەیشنا پشکنین و کۆنتڕۆڵکرنا خێرایا اینتەرنێتێ.",
-    additionalInfo: "Requires Android 8.0 and above. Completely ad-free and open-source utility tool for advanced network tracking.",
+    additionalInfo: "Requires Android 8.0 and above. Completely ad-free utility tool.",
     version: "1.1.0",
     size: "15.4 MB",
-    downloadsCount: "2.5K",
+    downloadsCount: "0",
     iconUrl: "https://raw.githubusercontent.com/dlxoin98/dw-store-backend/main/uploads/1792442563239-ic_launcher_foreground.webp",
     apkUrl: "https://raw.githubusercontent.com/dlxoin98/dw-store-backend/main/uploads/1792442563247-app-debug.apk",
     screenshots: [
@@ -26,7 +26,7 @@ let apps = [
 // 📲 1. Android API
 app.get('/api/apps', (req, res) => res.json(apps));
 
-// 🌐 2. Admin Panel UI (Add, Edit, Delete, Photos, Additional Info)
+// 🌐 2. Admin Panel UI (Clean, No Fake Stats, Full Edit & Photos Support)
 app.get('/admin', (req, res) => {
   const editId = req.query.edit;
   const appToEdit = apps.find(a => a.id === editId);
@@ -97,11 +97,6 @@ app.get('/admin', (req, res) => {
                         </div>
 
                         <div class="form-group">
-                            <label>Downloads Count</label>
-                            <input type="text" name="downloadsCount" value="${appToEdit ? appToEdit.downloadsCount : '1K'}" required>
-                        </div>
-
-                        <div class="form-group">
                             <label>Short Description</label>
                             <textarea name="description" rows="2" required>${appToEdit ? appToEdit.description : ''}</textarea>
                         </div>
@@ -168,7 +163,7 @@ app.get('/admin', (req, res) => {
   `);
 });
 
-// Helper to parse comma-separated screenshots
+// Helper to parse screenshots
 function parseScreenshots(screenshotsInput) {
   if (!screenshotsInput) return [];
   return typeof screenshotsInput === 'string'
@@ -176,9 +171,9 @@ function parseScreenshots(screenshotsInput) {
     : screenshotsInput;
 }
 
-// ➕ Add App Route
+// ➕ Add App Route (Downloads count starts at 0 naturally)
 app.post('/admin/add', (req, res) => {
-  const { name, description, additionalInfo, version, size, downloadsCount, iconUrl, apkUrl, screenshots } = req.body;
+  const { name, description, additionalInfo, version, size, iconUrl, apkUrl, screenshots } = req.body;
   apps.push({
     id: Date.now().toString(),
     name,
@@ -186,7 +181,7 @@ app.post('/admin/add', (req, res) => {
     additionalInfo: additionalInfo || "",
     version,
     size,
-    downloadsCount,
+    downloadsCount: "0",
     iconUrl,
     apkUrl,
     screenshots: parseScreenshots(screenshots)
@@ -199,7 +194,7 @@ app.post('/admin/edit/:id', (req, res) => {
   const { id } = req.params;
   const index = apps.findIndex(a => a.id === id);
   if (index !== -1) {
-    const { name, description, additionalInfo, version, size, downloadsCount, iconUrl, apkUrl, screenshots } = req.body;
+    const { name, description, additionalInfo, version, size, iconUrl, apkUrl, screenshots } = req.body;
     apps[index] = {
       ...apps[index],
       name,
@@ -207,7 +202,6 @@ app.post('/admin/edit/:id', (req, res) => {
       additionalInfo: additionalInfo || "",
       version,
       size,
-      downloadsCount,
       iconUrl,
       apkUrl,
       screenshots: parseScreenshots(screenshots)
